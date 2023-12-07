@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        .container {
+          display: flex;
+          flex-direction: column; /* 수직으로 정렬하기 위해 컨테이너의 방향을 세로로 지정 */
+          justify-content: center; /* 수직 가운데 정렬 */
+          align-items: center; /* 수평 가운데 정렬 */
+        }
+  
+        #camera {
+          background-color: aquamarine;
+          display: flex;
+          flex-direction: column; /* 수직으로 정렬하기 위해 컨테이너의 방향을 세로로 지정 */
+          justify-content: center; /* 수직 가운데 정렬 */
+          align-items: center; /* 수평 가운데 정렬 */
+          width: 1000px;
+          height: 500px;
+          margin: 10px;
+          padding: 2%;
+          border-radius: 20px;
+        }
+        #video {
+          max-width: 100%; /* 비디오의 최대 너비를 부모 요소에 맞게 조절 */
+          max-height: 100%; /* 비디오의 최대 높이를 부모 요소에 맞게 조절 */
+          width: auto; /* 가로 크기를 자동으로 조절하여 비율 유지 */
+          height: auto;
+        }
+      </style>
+    <title>Population-Dense Traffic Lights</title>
+    <!-- Bootstrap core CSS -->
+        
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+         
+    <!-- Custom styles for this template -->
+        
+    <link href="/static/css/starter-template.css" rel="stylesheet" />
+  </head>
+  <body style="background-color: darkgray;">
+    <div class="container" style="background-color: darkgray; border-radius: 30px;">
+      <h1>Camera 1</h1>
+      <div id="camera">
+        <img id="video" alt="OpenCV Image Stream" />
+      </div>
+      <ul class="list-group" style="width: 200px">
+        <li
+          class="list-group-item d-flex justify-content-between align-items-center"
+        >
+          people count :
+          <span class="badge bg-primary rounded-pill" id="people-count">0</span>
+        </li>
+      </ul>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+      <script>
+        const video = document.getElementById("video");
+        const peopleCountElement = document.getElementById("people-count");
+        const bgc = document.getElementById("camera");
+        const socket = io.connect(
+          "http://" + document.domain + ":" + location.port
+        );
+
+        socket.on("update_frame", function (data) {
+          if (data.image_base64 !== "") {
+            video.src = "data:image/jpeg;base64," + data.image_base64;
+          }
+
+          if (data.num !== undefined) {
+            peopleCountElement.innerHTML = data.num;
+            bgc.style.backgroundColor = "aquamarine";
+            if (data.num === -1) {
+              peopleCountElement.innerHTML = "Warning";
+              bgc.style.backgroundColor = "red";
+            }
+          }
+        });
+      </script>
+    </div>
+     
+    <script src="/static/js/jquery.min.js"></script>
+        
+    <script src="/static/js/bootstrap.min.js"></script>
+  </body>
+</html>
